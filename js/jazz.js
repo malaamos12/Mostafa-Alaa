@@ -1,8 +1,9 @@
 /* ===== background music: soft jazz-style loop generated live with Web Audio (no audio file, no copyright).
-   Drop an mp3 you have the rights to next to the pages, named music.mp3, and it plays instead (auto-detected).
+   Drop an mp3 you have the rights to next to the pages, named music.mp3 (in assets/audio/, or next to the page), and it plays instead (auto-detected).
    Both pages share one music "session": the report continues the music instead of restarting it. ===== */
 const Jazz = (function () {
-  const FILE = "assets/audio/music.mp3",
+  const ROOT = document.documentElement.dataset.root || "",
+    FILES = [ROOT + "assets/audio/music.mp3", ROOT + "music.mp3"],
     KEY = "ma_music",
     BPM = 68,
     B = 60 / BPM,
@@ -366,8 +367,13 @@ const Jazz = (function () {
     }
     ui();
   }
-  function begin(pos, user) {
-    const a = new Audio(FILE);
+  function begin(pos, user, i) {
+    i = i || 0;
+    if (i >= FILES.length) {
+      startGen(pos);
+      return;
+    }
+    const a = new Audio(FILES[i]);
     a.loop = true;
     a.volume = 0;
     a.addEventListener(
@@ -404,7 +410,7 @@ const Jazz = (function () {
         armGesture(() => start(true));
         ui();
       } else {
-        startGen(pos);
+        begin(pos, user, i + 1);
       }
     });
   }

@@ -111,7 +111,8 @@ let lang = (() => {
     const q = new URLSearchParams(location.search).get("lang");
     let st = null;
     try {
-      st = localStorage.getItem("ma_lang");
+      const s = JSON.parse(localStorage.getItem("ma_lang") || "null");
+      if (s && Date.now() - s.at < 1209600000) st = s.l;
     } catch (e) {}
     return q === "ar" || q === "en" ? q : st === "ar" ? "ar" : "en";
   })(),
@@ -319,11 +320,11 @@ document.querySelectorAll(".rv").forEach((e) => io.observe(e));
 function setLang(l) {
   lang = l;
   try {
-    localStorage.setItem("ma_lang", l);
+    localStorage.setItem("ma_lang", JSON.stringify({ l, at: Date.now() }));
   } catch (e) {}
   document
-    .querySelectorAll('a[href^="index.html"]')
-    .forEach((a) => (a.href = "index.html?skip=1&lang=" + l));
+    .querySelectorAll('a.logo, a[data-k="back"]')
+    .forEach((a) => (a.href = l === "ar" ? "ar/" : "./"));
   document.documentElement.lang = l;
   document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
   texts();
